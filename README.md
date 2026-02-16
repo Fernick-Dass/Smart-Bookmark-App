@@ -1,12 +1,11 @@
 # Smart Bookmark App
 
-Live URL: ADD_LIVE_VERCEL_URL_HERE
+Live URL: https://smart-bookmark-app-liard.vercel.app/
 
-Problems encountered and how they were solved
-- Row-Level Security (RLS) exposed other users' data during early testing — solution: enabled RLS and added a policy restricting operations to rows where auth.uid() = user_id.
-- Google OAuth redirect mismatch caused sign-in failures — solution: configured OAuth consent screen, created a Google OAuth client, and added the Supabase callback and `http://localhost:3000` as authorized redirect URIs.
-- Realtime updates not appearing in other tabs — solution: added a Supabase realtime subscription on the `bookmarks` table and updated client state on INSERT/DELETE/UPDATE; verified Realtime is enabled in Supabase.
-- Auth state race conditions on initial load — solution: call `supabase.auth.getUser()` on mount and listen to `onAuthStateChange` to keep UI in sync.
-- Build-time env errors when creating Supabase client — solution: only create the Supabase client at runtime (browser) when NEXT_PUBLIC env vars are present.
+## Problems encountered and how I solved them
 
+- **Supabase (data privacy)**  
+  During early testing some users could see other users' bookmarks. I enabled Row-Level Security (RLS) on the `bookmarks` table and added a policy that only allows access when `auth.uid() = user_id`. This makes each user's bookmarks private.
 
+- **Google OAuth / redirect URI**  
+  Sign-in failed with `redirect_uri_mismatch`. I created a Google OAuth client, added the exact Supabase callback URL (for example: `https://<your-project>.supabase.co/auth/v1/callback`) and `http://localhost:3000` for local testing to the Authorized redirect URIs, then pasted the Client ID and Secret into Supabase → Authentication → Sign In / Providers → Google. Wait a few minutes for propagation and test in an incognito window.
